@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/f/My Infomation/semester/数据结构/homework/priority_queue/exceptions.hpp
+cstddef
+-
+cstring
+-
+string
+-
+
+/mnt/f/My Infomation/semester/数据结构/homework/priority_queue/main.cpp
+iostream
+-
+cstdio
+-
+algorithm
+-
+queue
+-
+ctime
+-
+cstdlib
+-
+priority_queue.hpp
+/mnt/f/My Infomation/semester/数据结构/homework/priority_queue/priority_queue.hpp
+
+/mnt/f/My Infomation/semester/数据结构/homework/priority_queue/priority_queue.hpp
+cstddef
+-
+functional
+-
+exceptions.hpp
+/mnt/f/My Infomation/semester/数据结构/homework/priority_queue/exceptions.hpp
+

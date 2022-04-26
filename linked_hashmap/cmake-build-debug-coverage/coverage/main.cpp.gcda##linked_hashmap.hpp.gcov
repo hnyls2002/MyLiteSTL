@@ -1,0 +1,1017 @@
+        -:    0:Source:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/linked_hashmap.hpp
+        -:    0:Graph:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/cmake-build-debug-coverage/CMakeFiles/linked_hashmap.dir/main.cpp.gcno
+        -:    0:Data:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/cmake-build-debug-coverage/CMakeFiles/linked_hashmap.dir/main.cpp.gcda
+        -:    0:Runs:1
+        -:    1:/**
+        -:    2: * implement a container like std::linked_hashmap
+        -:    3: */
+        -:    4:#ifndef SJTU_MAP_HPP
+        -:    5:#define SJTU_MAP_HPP
+        -:    6:
+        -:    7:// only for std::equal_to<T> and std::hash<T>
+        -:    8:#include <functional>
+        -:    9:#include <cstddef>
+        -:   10:#include "utility.hpp"
+        -:   11:#include "exceptions.hpp"
+        -:   12:
+        -:   13:namespace sjtu {
+        -:   14:    /**
+        -:   15:     * In linked_hashmap, iteration ordering is differ from map,
+        -:   16:     * which is the order in which keys were inserted into the map.
+        -:   17:     * You should maintain a doubly-linked list running through all
+        -:   18:     * of its entries to keep the correct iteration order.
+        -:   19:     *
+        -:   20:     * Note that insertion order is not affected if a key is re-inserted into the map.
+        -:   21:     */
+        -:   22:
+        -:   23:    template<
+        -:   24:            class Key,
+        -:   25:            class T,
+        -:   26:            class Hash = std::hash<Key>,
+        -:   27:            class Equal = std::equal_to<Key>
+        -:   28:    >
+        -:   29:    class linked_hashmap {
+        -:   30:    public:
+        -:   31:        /**
+        -:   32:         * the internal type of data.
+        -:   33:         * it should have a default constructor, a copy constructor.
+        -:   34:         * You can use sjtu::linked_hashmap as value_type by typedef.
+        -:   35:         */
+        -:   36:        typedef pair<const Key, T> value_type;
+        -:   37:    private:
+        -:   38:
+        -:   39:        using HM = linked_hashmap<Key, T, Hash, Equal>;
+        -:   40:
+        -:   41:        Hash hash_fun;
+        -:   42:        Equal is_equal;
+        -:   43:
+        -:   44:        const size_t init_index_size = 8;
+        -:   45:        const double double_factor = 0.75;
+        -:   46:        const double half_factor = 0.25;
+        -:   47:        size_t index_size, element_size, mod;
+        -:   48:        // mod must be a prime
+        -:   49:
+        -:   50:        struct node {
+        -:   51:            node *up, *down, *left, *right;
+        -:   52:            value_type *data;
+        -:   53:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE4nodeC2Ev called 1695969 returned 100% blocks executed 100%
+  1695969:   54:            node() {
+  1695969:   55:                up = down = left = right = nullptr;
+  1695969:   56:                data = nullptr;
+  1695969:   57:            }
+        -:   58:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE4nodeD2Ev called 1695969 returned 100% blocks executed 100%
+  1695969:   59:            ~node() {
+  1695969:   60:                if (data != nullptr)delete data;
+  1695969:   60-block  0
+branch  0 taken 257600 (fallthrough)
+branch  1 taken 1438369
+   257600:   60-block  1
+branch  2 taken 257600 (fallthrough)
+branch  3 taken 0
+   257600:   60-block  2
+call    4 returned 257600
+call    5 returned 257600
+  1695969:   61:                data = nullptr;
+  1695969:   62:            }
+        -:   63:        } *index, *nil;
+        -:   64:
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE8is_primeERKm called 702 returned 100% blocks executed 100%
+      702:   65:        bool is_prime(const size_t &x) const {
+     6754:   66:            for (long long i = 2; i * i <= x; ++i)
+      702:   66-block  0
+     6754:   66-block  1
+branch  0 taken 6228 (fallthrough)
+branch  1 taken 526
+     6052:   66-block  2
+     6228:   67:                if (x % i == 0)return false;
+     6228:   67-block  0
+branch  0 taken 176 (fallthrough)
+branch  1 taken 6052
+      176:   67-block  1
+      526:   68:            return true;
+      526:   68-block  0
+        -:   69:        }
+        -:   70:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE12update_primeEv called 526 returned 100% blocks executed 100%
+      526:   71:        void update_prime() {
+      702:   72:            for (mod = index_size - 1; !is_prime(mod); --mod);
+      526:   72-block  0
+      702:   72-block  1
+call    0 returned 702
+branch  1 taken 176 (fallthrough)
+branch  2 taken 526
+      176:   72-block  2
+      526:   73:        }
+        -:   74:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE9my_insertEPNSA_4nodeE called 781887 returned 100% blocks executed 100%
+   781887:   75:        void my_insert(node *now) {
+   781887:   76:            size_t ind = hash_fun(now->data->first) % mod;
+   781887:   76-block  0
+call    0 returned 781887
+call    1 returned 781887
+call    2 returned 781887
+   781887:   77:            node *ptr = &index[ind], *nex = ptr->down;
+   781887:   78:            ptr->down = now, now->up = ptr;
+   781887:   79:            now->down = nex;
+   781887:   80:            if (nex != nullptr)nex->up = now;
+branch  0 taken 327 (fallthrough)
+branch  1 taken 781560
+      327:   80-block  0
+   781887:   81:        }
+        -:   82:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE17insert_into_tableENS_4pairIKS1_S7_EE called 200000 returned 100% blocks executed 89%
+   200000:   83:        void insert_into_table(value_type ele) {
+   200000:   84:            node *nptr = new node;
+   200000:   84-block  0
+call    0 returned 200000
+call    1 returned 200000
+   200000:   85:            nptr->data = new value_type(ele);
+call    0 returned 200000
+call    1 returned 200000
+branch  2 taken 200000 (fallthrough)
+branch  3 taken 0 (throw)
+    $$$$$:   85-block  0
+call    4 never executed
+        -:   86:
+   200000:   87:            node *pre = nil->left;
+   200000:   88:            pre->right = nptr, nptr->left = pre;
+   200000:   89:            nptr->right = nil, nil->left = nptr;
+   200000:   90:            my_insert(nptr);
+   200000:   90-block  0
+call    0 returned 200000
+        -:   91:
+   200000:   92:            ++element_size;
+   200000:   93:            re_allocate();
+call    0 returned 200000
+   200000:   94:        }
+        -:   95:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE11re_allocateEv called 300000 returned 100% blocks executed 95%
+   300000:   96:        void re_allocate() {
+   300000:   97:            if (element_size < index_size * half_factor && index_size > init_index_size) {
+   300000:   97-block  0
+branch  0 taken 19 (fallthrough)
+branch  1 taken 299981
+       19:   97-block  1
+branch  2 taken 15 (fallthrough)
+branch  3 taken 4
+        -:   98:                // do half space
+   524287:   99:                delete[]index;
+       15:   99-block  0
+branch  0 taken 15 (fallthrough)
+branch  1 taken 0
+       15:   99-block  1
+   524287:   99-block  2
+branch  2 taken 524272 (fallthrough)
+branch  3 taken 15
+   524272:   99-block  3
+call    4 returned 524272
+       15:   99-block  4
+call    5 returned 15
+  262151*:  100:                index = new node[index_size >>= 1];
+       15:  100-block  0
+branch  0 taken 15 (fallthrough)
+branch  1 taken 0
+       15:  100-block  1
+    %%%%%:  100-block  2
+       15:  100-block  3
+call    2 returned 15
+   262151:  100-block  4
+branch  3 taken 262136 (fallthrough)
+branch  4 taken 15
+   262136:  100-block  5
+call    5 returned 262136
+       15:  101:                update_prime();
+       15:  101-block  0
+call    0 returned 15
+        -:  102:
+   131068:  103:                for (node *ptr = nil->right; ptr != nil; ptr = ptr->right)
+   131068:  103-block  0
+branch  0 taken 131053 (fallthrough)
+branch  1 taken 15
+   131068:  104:                    my_insert(ptr);
+   131053:  104-block  0
+call    0 returned 131053
+       15:  104-block  1
+        -:  105:
+   299985:  106:            } else if (element_size > index_size * double_factor) {
+   299985:  106-block  0
+branch  0 taken 30 (fallthrough)
+branch  1 taken 299955
+        -:  107:                // do double space
+   524302:  108:                delete[]index;
+       30:  108-block  0
+branch  0 taken 30 (fallthrough)
+branch  1 taken 0
+       30:  108-block  1
+   524302:  108-block  2
+branch  2 taken 524272 (fallthrough)
+branch  3 taken 30
+   524272:  108-block  3
+call    4 returned 524272
+       30:  108-block  4
+call    5 returned 30
+ 1048574*:  109:                index = new node[index_size <<= 1];
+       30:  109-block  0
+branch  0 taken 30 (fallthrough)
+branch  1 taken 0
+       30:  109-block  1
+    %%%%%:  109-block  2
+       30:  109-block  3
+call    2 returned 30
+  1048574:  109-block  4
+branch  3 taken 1048544 (fallthrough)
+branch  4 taken 30
+  1048544:  109-block  5
+call    5 returned 1048544
+       30:  110:                update_prime();
+       30:  110-block  0
+call    0 returned 30
+        -:  111:
+   393264:  112:                for (node *ptr = nil->right; ptr != nil; ptr = ptr->right)
+   393264:  112-block  0
+branch  0 taken 393234 (fallthrough)
+branch  1 taken 30
+   393234:  113:                    my_insert(ptr);
+   393234:  113-block  0
+call    0 returned 393234
+        -:  114:            }
+   300000:  115:        }
+        -:  116:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE16my_deconstructorEv called 961 returned 100% blocks executed 100%
+      961:  117:        void my_deconstructor() {
+   158561:  118:            for (node *ptr = nil->right; ptr != nil;) {
+      961:  118-block  0
+   158561:  118-block  1
+branch  0 taken 157600 (fallthrough)
+branch  1 taken 961
+   157600:  119:                node *nex = ptr->right;
+   157600:  120:                delete ptr;
+   157600:  120-block  0
+branch  0 taken 157600 (fallthrough)
+branch  1 taken 0
+   157600:  120-block  1
+call    2 returned 157600
+call    3 returned 157600
+   157600:  121:                ptr = nex;
+   157600:  121-block  0
+        -:  122:            }
+      961:  123:            delete nil;
+      961:  123-block  0
+branch  0 taken 961 (fallthrough)
+branch  1 taken 0
+      961:  123-block  1
+call    2 returned 961
+call    3 returned 961
+   389825:  124:            delete[]index;
+      961:  124-block  0
+branch  0 taken 961 (fallthrough)
+branch  1 taken 0
+      961:  124-block  1
+   389825:  124-block  2
+branch  2 taken 388864 (fallthrough)
+branch  3 taken 961
+   388864:  124-block  3
+call    4 returned 388864
+      961:  124-block  4
+call    5 returned 961
+      961:  125:            nil = index = nullptr;
+      961:  126:            index_size = element_size = mod = 0;
+      961:  127:        }
+        -:  128:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE7my_copyERKSA_ called 480 returned 100% blocks executed 92%
+      480:  129:        void my_copy(const linked_hashmap &other) {
+      480:  130:            index_size = other.index_size;
+      480:  131:            element_size = other.element_size;
+      480:  132:            mod = other.mod;
+  123360*:  133:            index = new node[index_size];
+      480:  133-block  0
+branch  0 taken 480 (fallthrough)
+branch  1 taken 0
+      480:  133-block  1
+    %%%%%:  133-block  2
+      480:  133-block  3
+call    2 returned 480
+   123360:  133-block  4
+branch  3 taken 122880 (fallthrough)
+branch  4 taken 480
+   122880:  133-block  5
+call    5 returned 122880
+      480:  134:            nil = new node;
+      480:  134-block  0
+call    0 returned 480
+call    1 returned 480
+      480:  135:            nil->left = nil->right = nil;
+        -:  136:
+      480:  137:            node *ptr1 = nil, *ptr2 = other.nil;
+    58080:  138:            while (ptr2->right != other.nil) {
+    58080:  138-block  0
+branch  0 taken 57600 (fallthrough)
+branch  1 taken 480
+    57600:  139:                ptr1->right = new node;
+    57600:  139-block  0
+call    0 returned 57600
+call    1 returned 57600
+    57600:  140:                ptr1->right->left = ptr1;
+    57600:  141:                ptr1->right->data = new value_type(*(ptr2->right->data));
+call    0 returned 57600
+call    1 returned 57600
+branch  2 taken 57600 (fallthrough)
+branch  3 taken 0 (throw)
+    $$$$$:  141-block  0
+call    4 never executed
+    57600:  142:                ptr1 = ptr1->right;
+    57600:  143:                ptr2 = ptr2->right;
+    57600:  143-block  0
+        -:  144:            }
+      480:  145:            ptr1->right = nil;
+      480:  146:            nil->left = ptr1;
+        -:  147:
+    58080:  148:            for (node *ptr = nil->right; ptr != nil; ptr = ptr->right)
+      480:  148-block  0
+    58080:  148-block  1
+branch  0 taken 57600 (fallthrough)
+branch  1 taken 480
+    57600:  149:                my_insert(ptr);
+    57600:  149-block  0
+call    0 returned 57600
+      480:  150:        }
+      480:  150-block  0
+        -:  151:
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE7my_findERKS1_ called 749760 returned 100% blocks executed 88%
+   749760:  152:        node *my_find(const Key &key) const {
+   749760:  153:            size_t ind = hash_fun(key) % mod;
+   749760:  153-block  0
+call    0 returned 749760
+call    1 returned 749760
+call    2 returned 749760
+   749760:  154:            node *ptr = index[ind].down;
+  749760*:  155:            while (ptr != nullptr && !is_equal(ptr->data->first, key))
+   749760:  155-block  0
+branch  0 taken 549760 (fallthrough)
+branch  1 taken 200000
+   549760:  155-block  1
+call    2 returned 549760
+branch  3 taken 0 (fallthrough)
+branch  4 taken 549760
+    %%%%%:  155-block  2
+   749760:  155-block  3
+   749760:  155-block  4
+branch  5 taken 0 (fallthrough)
+branch  6 taken 749760
+    #####:  156:                ptr = ptr->down;
+    %%%%%:  156-block  0
+   749760:  157:            return ptr == nullptr ? nil : ptr;
+   749760:  157-block  0
+branch  0 taken 200000 (fallthrough)
+branch  1 taken 549760
+   200000:  157-block  1
+   549760:  157-block  2
+   749760:  157-block  3
+        -:  158:        }
+        -:  159:
+        -:  160:    public:
+        -:  161:
+        -:  162:        /**
+        -:  163:         * see BidirectionalIterator at CppReference for help.
+        -:  164:         *
+        -:  165:         * if there is anything wrong throw invalid_iterator.
+        -:  166:         *     like it = linked_hashmap.begin(); --it;
+        -:  167:         *       or it = linked_hashmap.end(); ++end();
+        -:  168:         */
+        -:  169:        class const_iterator;
+        -:  170:
+        -:  171:        class iterator {
+        -:  172:        private:
+        -:  173:            friend HM;
+        -:  174:            HM *bel;
+        -:  175:            node *ptr;
+        -:  176:            /**
+        -:  177:             * TODO add data members
+        -:  178:             *   just add whatever you want.
+        -:  179:             */
+        -:  180:        public:
+        -:  181:            // The following code is written for the C++ type_traits library.
+        -:  182:            // Type traits is a C++ feature for describing certain properties of a type.
+        -:  183:            // For instance, for an iterator, iterator::value_type is the type that the
+        -:  184:            // iterator points to.
+        -:  185:            // STL algorithms and containers may use these type_traits (e.g. the following
+        -:  186:            // typedef) to work properly.
+        -:  187:            // See these websites for more information:
+        -:  188:            // https://en.cppreference.com/w/cpp/header/type_traits
+        -:  189:            // About value_type: https://blog.csdn.net/u014299153/article/details/72419713
+        -:  190:            // About iterator_category: https://en.cppreference.com/w/cpp/iterator
+        -:  191:            using difference_type = std::ptrdiff_t;
+        -:  192:            using value_type = linked_hashmap::value_type;
+        -:  193:            using pointer = value_type *;
+        -:  194:            using reference = value_type &;
+        -:  195:            using iterator_category = std::output_iterator_tag;
+        -:  196:
+        -:  197:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE8iteratorC2EPSA_PNSA_4nodeE called 400125 returned 100% blocks executed 100%
+   400125:  198:            iterator(HM *_bel = nullptr, node *_ptr = nullptr) : bel(_bel), ptr(_ptr) {
+        -:  199:                // TODO
+   400125:  200:            }
+        -:  201:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE8iteratorC2ERKSB_ called 100121 returned 100% blocks executed 100%
+   100121:  202:            iterator(const iterator &other) : bel(other.bel), ptr(other.ptr) {
+        -:  203:                // TODO
+   100121:  204:            }
+        -:  205:
+        -:  206:            /**
+        -:  207:             * TODO iter++
+        -:  208:             */
+        -:  209:            iterator operator++(int) {
+        -:  210:                if (ptr == bel->nil)throw invalid_iterator();
+        -:  211:                iterator ret = *this;
+        -:  212:                ptr = ptr->right;
+        -:  213:                return ret;
+        -:  214:            }
+        -:  215:
+        -:  216:            /**
+        -:  217:             * TODO ++iter
+        -:  218:             */
+        -:  219:            iterator &operator++() {
+        -:  220:                if (ptr == bel->nil)throw invalid_iterator();
+        -:  221:                ptr = ptr->right;
+        -:  222:                return *this;
+        -:  223:            }
+        -:  224:
+        -:  225:            /**
+        -:  226:             * TODO iter--
+        -:  227:             */
+        -:  228:            iterator operator--(int) {
+        -:  229:                if (ptr->left == bel->nil)throw invalid_iterator();
+        -:  230:                iterator ret = *this;
+        -:  231:                ptr = ptr->left;
+        -:  232:                return ret;
+        -:  233:            }
+        -:  234:
+        -:  235:            /**
+        -:  236:             * TODO --iter
+        -:  237:             */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE8iteratormmEv called 120 returned 100% blocks executed 50%
+      120:  238:            iterator &operator--() {
+     120*:  239:                if (ptr->left == bel->nil)throw invalid_iterator();
+      120:  239-block  0
+branch  0 taken 0 (fallthrough)
+branch  1 taken 120
+    %%%%%:  239-block  1
+call    2 never executed
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  239-block  2
+call    6 never executed
+    $$$$$:  239-block  3
+call    7 never executed
+      120:  240:                ptr = ptr->left;
+      120:  241:                return *this;
+      120:  241-block  0
+      120:  241-block  1
+        -:  242:            }
+        -:  243:
+        -:  244:            /**
+        -:  245:             * a operator to check whether two iterators are same (pointing to the same memory).
+        -:  246:             */
+        -:  247:            value_type &operator*() const {
+        -:  248:                if (ptr == bel->nil)throw invalid_iterator();
+        -:  249:                return *(ptr->data);
+        -:  250:            }
+        -:  251:
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE8iteratoreqERKSB_ called 121 returned 100% blocks executed 100%
+      121:  252:            bool operator==(const iterator &rhs) const {
+      121:  253:                return ptr == rhs.ptr;
+      121:  253-block  0
+        -:  254:            }
+        -:  255:
+        -:  256:            bool operator==(const const_iterator &rhs) const {
+        -:  257:                return ptr == rhs.ptr;
+        -:  258:            }
+        -:  259:
+        -:  260:            /**
+        -:  261:             * some other operator for iterator.
+        -:  262:             */
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE8iteratorneERKSB_ called 100001 returned 100% blocks executed 100%
+   100001:  263:            bool operator!=(const iterator &rhs) const {
+   100001:  264:                return ptr != rhs.ptr;
+   100001:  264-block  0
+        -:  265:            }
+        -:  266:
+        -:  267:            bool operator!=(const const_iterator &rhs) const {
+        -:  268:                return ptr != rhs.ptr;
+        -:  269:            }
+        -:  270:
+        -:  271:            /**
+        -:  272:             * for the support of it->first.
+        -:  273:             * See <http://kelvinh.github.io/blog/2013/11/20/overloading-of-member-access-operator-dash-greater-than-symbol-in-cpp/> for help.
+        -:  274:             */
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE8iteratorptEv called 120 returned 100% blocks executed 100%
+      120:  275:            value_type *operator->() const noexcept {
+      120:  276:                return ptr->data;
+      120:  276-block  0
+        -:  277:            }
+        -:  278:        };
+        -:  279:
+        -:  280:        class const_iterator {
+        -:  281:            // it should has similar member method as iterator.
+        -:  282:            //  and it should be able to construct from an iterator.
+        -:  283:        private:
+        -:  284:            friend HM;
+        -:  285:            const HM *bel;
+        -:  286:            const node *ptr;
+        -:  287:            // data members.
+        -:  288:        public:
+        -:  289:
+        -:  290:            using difference_type = std::ptrdiff_t;
+        -:  291:            using value_type = linked_hashmap::value_type;
+        -:  292:            using pointer = value_type *;
+        -:  293:            using reference = value_type &;
+        -:  294:            using iterator_category = std::output_iterator_tag;
+        -:  295:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE14const_iteratorC2EPKSA_PKNSA_4nodeE called 123 returned 100% blocks executed 100%
+      123:  296:            const_iterator(const HM *_bel = nullptr, const node *_ptr = nullptr) : bel(_bel), ptr(_ptr) {
+        -:  297:                // TODO
+      123:  298:            }
+        -:  299:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE14const_iteratorC2ERKSB_ called 120 returned 100% blocks executed 100%
+      120:  300:            const_iterator(const const_iterator &other) : bel(other.bel), ptr(other.ptr) {
+        -:  301:                // TODO
+      120:  302:            }
+        -:  303:
+        -:  304:            const_iterator(const iterator &other) : bel(other.bel), ptr(other.ptr) {
+        -:  305:                // TODO
+        -:  306:            }
+        -:  307:            // And other methods in iterator.
+        -:  308:            // And other methods in iterator.
+        -:  309:            // And other methods in iterator.
+        -:  310:
+        -:  311:            /**
+        -:  312:             * TODO iter++
+        -:  313:             */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE14const_iteratorppEi called 120 returned 100% blocks executed 56%
+      120:  314:            const_iterator operator++(int) {
+     120*:  315:                if (ptr == bel->nil)throw invalid_iterator();
+      120:  315-block  0
+branch  0 taken 0 (fallthrough)
+branch  1 taken 120
+    %%%%%:  315-block  1
+call    2 never executed
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  315-block  2
+call    6 never executed
+    $$$$$:  315-block  3
+call    7 never executed
+      120:  316:                const_iterator ret = *this;
+      120:  316-block  0
+call    0 returned 120
+      120:  317:                ptr = ptr->right;
+      120:  318:                return ret;
+      120:  318-block  0
+        -:  319:            }
+        -:  320:
+        -:  321:            /**
+        -:  322:             * TODO ++iter
+        -:  323:             */
+        -:  324:            const_iterator &operator++() {
+        -:  325:                if (ptr == bel->nil)throw invalid_iterator();
+        -:  326:                ptr = ptr->right;
+        -:  327:                return *this;
+        -:  328:            }
+        -:  329:
+        -:  330:            /**
+        -:  331:             * TODO iter--
+        -:  332:             */
+        -:  333:            const_iterator operator--(int) {
+        -:  334:                if (ptr->left == bel->nil)throw invalid_iterator();
+        -:  335:                const_iterator ret = *this;
+        -:  336:                ptr = ptr->left;
+        -:  337:                return ret;
+        -:  338:            }
+        -:  339:
+        -:  340:            /**
+        -:  341:             * TODO --iter
+        -:  342:             */
+        -:  343:            const_iterator &operator--() {
+        -:  344:                if (ptr->left == bel->nil)throw invalid_iterator();
+        -:  345:                ptr = ptr->left;
+        -:  346:                return *this;
+        -:  347:            }
+        -:  348:
+        -:  349:            /**
+        -:  350:             * a operator to check whether two iterators are same (pointing to the same memory).
+        -:  351:             */
+        -:  352:            value_type &operator*() const {
+        -:  353:                if (ptr == bel->nil)throw invalid_iterator();
+        -:  354:                return *(ptr->data);
+        -:  355:            }
+        -:  356:
+        -:  357:            bool operator==(const iterator &rhs) const {
+        -:  358:                return ptr == rhs.ptr;
+        -:  359:            }
+        -:  360:
+        -:  361:            bool operator==(const const_iterator &rhs) const {
+        -:  362:                return ptr == rhs.ptr;
+        -:  363:            }
+        -:  364:
+        -:  365:            /**
+        -:  366:             * some other operator for iterator.
+        -:  367:             */
+        -:  368:            bool operator!=(const iterator &rhs) const {
+        -:  369:                return ptr != rhs.ptr;
+        -:  370:            }
+        -:  371:
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE14const_iteratorneERKSB_ called 121 returned 100% blocks executed 100%
+      121:  372:            bool operator!=(const const_iterator &rhs) const {
+      121:  373:                return ptr != rhs.ptr;
+      121:  373-block  0
+        -:  374:            }
+        -:  375:
+        -:  376:            /**
+        -:  377:             * for the support of it->first.
+        -:  378:             * See <http://kelvinh.github.io/blog/2013/11/20/overloading-of-member-access-operator-dash-greater-than-symbol-in-cpp/> for help.
+        -:  379:             */
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE14const_iteratorptEv called 120 returned 100% blocks executed 100%
+      120:  380:            const value_type *operator->() const noexcept {
+      120:  381:                return ptr->data;
+      120:  381-block  0
+        -:  382:            }
+        -:  383:        };
+        -:  384:
+        -:  385:        /**
+        -:  386:         * TODO two constructors
+        -:  387:         */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualEC2Ev called 1 returned 100% blocks executed 92%
+        1:  388:        linked_hashmap() {
+        1:  389:            index_size = init_index_size;
+        1:  390:            element_size = 0;
+        1:  391:            update_prime();
+        1:  391-block  0
+call    0 returned 1
+       9*:  392:            index = new node[init_index_size];
+branch  0 taken 1 (fallthrough)
+branch  1 taken 0
+        1:  392-block  0
+    %%%%%:  392-block  1
+        1:  392-block  2
+call    2 returned 1
+        9:  392-block  3
+branch  3 taken 8 (fallthrough)
+branch  4 taken 1
+        8:  392-block  4
+call    5 returned 8
+        1:  393:            nil = new node;
+        1:  393-block  0
+call    0 returned 1
+call    1 returned 1
+        1:  394:            nil->left = nil->right = nil;
+        1:  395:        }
+        -:  396:
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualEC2ERKSA_ called 120 returned 100% blocks executed 100%
+      120:  397:        linked_hashmap(const linked_hashmap &other) {
+      120:  398:            my_copy(other);
+      120:  398-block  0
+call    0 returned 120
+      120:  399:        }
+        -:  400:
+        -:  401:        /**
+        -:  402:         * TODO assignment operator
+        -:  403:         */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualEaSERKSA_ called 360 returned 100% blocks executed 83%
+      360:  404:        linked_hashmap &operator=(const linked_hashmap &other) {
+     360*:  405:            if (this == &other)return *this;
+      360:  405-block  0
+branch  0 taken 0 (fallthrough)
+branch  1 taken 360
+    %%%%%:  405-block  1
+      360:  406:            my_deconstructor();
+      360:  406-block  0
+call    0 returned 360
+      360:  407:            my_copy(other);
+call    0 returned 360
+      360:  408:        }
+        -:  409:
+        -:  410:        /**
+        -:  411:         * TODO Destructors
+        -:  412:         */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualED2Ev called 121 returned 100% blocks executed 100%
+      121:  413:        ~linked_hashmap() {
+      121:  414:            my_deconstructor();
+      121:  414-block  0
+call    0 returned 121
+      121:  415:        }
+        -:  416:
+        -:  417:        /**
+        -:  418:         * TODO
+        -:  419:         * access specified element with bounds checking
+        -:  420:         * Returns a reference to the mapped value of the element with key equivalent to key.
+        -:  421:         * If no such element exists, an exception of type `index_out_of_bound'
+        -:  422:         */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE2atERKS1_ called 120 returned 100% blocks executed 56%
+      120:  423:        T &at(const Key &key) {
+      120:  424:            node *ptr = my_find(key);
+      120:  424-block  0
+call    0 returned 120
+     120*:  425:            if (ptr == nil)throw index_out_of_bound();
+branch  0 taken 0 (fallthrough)
+branch  1 taken 120
+    %%%%%:  425-block  0
+call    2 never executed
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  425-block  1
+call    6 never executed
+    $$$$$:  425-block  2
+call    7 never executed
+      120:  426:            return ptr->data->second;
+      120:  426-block  0
+      120:  426-block  1
+        -:  427:        }
+        -:  428:
+        -:  429:        const T &at(const Key &key) const {
+        -:  430:            node *ptr = my_find(key);
+        -:  431:            if (ptr == nil)throw index_out_of_bound();
+        -:  432:            return ptr->data->second;
+        -:  433:        }
+        -:  434:
+        -:  435:        /**
+        -:  436:         * TODO
+        -:  437:         * access specified element
+        -:  438:         * Returns a reference to the value that is mapped to a key equivalent to key,
+        -:  439:         *   performing an insertion if such key does not already exist.
+        -:  440:         */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualEixERKS1_ called 150000 returned 100% blocks executed 71%
+   150000:  441:        T &operator[](const Key &key) {
+   150000:  442:            node *ptr = my_find(key);
+   150000:  442-block  0
+call    0 returned 150000
+   150000:  443:            if (ptr == nil)insert_into_table(value_type(key, T()));
+branch  0 taken 150000 (fallthrough)
+branch  1 taken 0
+   150000:  443-block  0
+call    2 returned 150000
+call    3 returned 150000
+branch  4 taken 150000 (fallthrough)
+branch  5 taken 0 (throw)
+   150000:  443-block  1
+call    6 returned 150000
+branch  7 taken 150000 (fallthrough)
+branch  8 taken 0 (throw)
+   150000:  443-block  2
+call    9 returned 150000
+call   10 returned 150000
+    $$$$$:  443-block  3
+call   11 never executed
+    $$$$$:  443-block  4
+    $$$$$:  443-block  5
+call   12 never executed
+   150000:  444:            return my_find(key)->data->second;
+   150000:  444-block  0
+call    0 returned 150000
+   150000:  444-block  1
+        -:  445:        }
+        -:  446:
+        -:  447:        /**
+        -:  448:         * behave like at() throw index_out_of_bound if such key does not exist.
+        -:  449:         */
+        -:  450:        const T &operator[](const Key &key) const {
+        -:  451:            node *ptr = my_find(key);
+        -:  452:            if (ptr == nil)throw index_out_of_bound();
+        -:  453:            return ptr->data->second;
+        -:  454:        }
+        -:  455:
+        -:  456:        /**
+        -:  457:         * return a iterator to the beginning
+        -:  458:         */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE5beginEv called 362 returned 100% blocks executed 100%
+      362:  459:        iterator begin() {
+      362:  460:            return iterator(this, nil->right);
+      362:  460-block  0
+call    0 returned 362
+        -:  461:        }
+        -:  462:
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE6cbeginEv called 1 returned 100% blocks executed 100%
+        1:  463:        const_iterator cbegin() const {
+        1:  464:            return const_iterator(this, nil->right);
+        1:  464-block  0
+call    0 returned 1
+        -:  465:        }
+        -:  466:
+        -:  467:        /**
+        -:  468:         * return a iterator to the end
+        -:  469:         * in fact, it returns past-the-end.
+        -:  470:         */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE3endEv called 100002 returned 100% blocks executed 100%
+   100002:  471:        iterator end() {
+   100002:  472:            return iterator(this, nil);
+   100002:  472-block  0
+call    0 returned 100002
+        -:  473:        }
+        -:  474:
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE4cendEv called 121 returned 100% blocks executed 100%
+      121:  475:        const_iterator cend() const {
+      121:  476:            return const_iterator(this, nil);
+      121:  476-block  0
+call    0 returned 121
+        -:  477:        }
+        -:  478:
+        -:  479:        /**
+        -:  480:         * checks whether the container is empty
+        -:  481:         * return true if empty, otherwise false.
+        -:  482:         */
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE5emptyEv called 2 returned 100% blocks executed 100%
+        2:  483:        bool empty() const {
+        2:  484:            return element_size == 0;
+        2:  484-block  0
+        -:  485:        }
+        -:  486:
+        -:  487:        /**
+        -:  488:         * returns the number of elements.
+        -:  489:         */
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE4sizeEv called 1084 returned 100% blocks executed 100%
+     1084:  490:        size_t size() const {
+     1084:  491:            return element_size;
+     1084:  491-block  0
+        -:  492:        }
+        -:  493:
+        -:  494:        /**
+        -:  495:         * clears the contents
+        -:  496:         */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE5clearEv called 480 returned 100% blocks executed 92%
+      480:  497:        void clear() {
+      480:  498:            my_deconstructor();
+      480:  498-block  0
+call    0 returned 480
+      480:  499:            index_size = init_index_size;
+      480:  500:            element_size = 0;
+      480:  501:            update_prime();
+call    0 returned 480
+    4320*:  502:            index = new node[init_index_size];
+branch  0 taken 480 (fallthrough)
+branch  1 taken 0
+      480:  502-block  0
+    %%%%%:  502-block  1
+      480:  502-block  2
+call    2 returned 480
+     4320:  502-block  3
+branch  3 taken 3840 (fallthrough)
+branch  4 taken 480
+     3840:  502-block  4
+call    5 returned 3840
+      480:  503:            nil = new node;
+      480:  503-block  0
+call    0 returned 480
+call    1 returned 480
+      480:  504:            nil->left = nil->right = nil;
+      480:  505:        }
+        -:  506:
+        -:  507:        /**
+        -:  508:         * insert an element.
+        -:  509:         * return a pair, the first of the pair is
+        -:  510:         *   the iterator to the new element (or the element that prevented the insertion),
+        -:  511:         *   the second one is true if insert successfully, or false.
+        -:  512:         */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE6insertERKNS_4pairIKS1_S7_EE called 100000 returned 100% blocks executed 88%
+   100000:  513:        pair<iterator, bool> insert(const value_type &value) {
+   100000:  514:            node *res = my_find(value.first);
+   100000:  514-block  0
+call    0 returned 100000
+        -:  515:
+   100000:  516:            if (res != nil)return {iterator(this, res), false};
+branch  0 taken 50000 (fallthrough)
+branch  1 taken 50000
+    50000:  516-block  0
+call    2 returned 50000
+call    3 returned 50000
+        -:  517:
+    50000:  518:            insert_into_table(value);
+    50000:  518-block  0
+call    0 returned 50000
+call    1 returned 50000
+branch  2 taken 50000 (fallthrough)
+branch  3 taken 0 (throw)
+    50000:  518-block  1
+call    4 returned 50000
+    $$$$$:  518-block  2
+call    5 never executed
+        -:  519:
+    50000:  520:            res = my_find(value.first);
+call    0 returned 50000
+    50000:  521:            return {iterator(this, res), true};
+call    0 returned 50000
+call    1 returned 50000
+        -:  522:        }
+        -:  523:
+        -:  524:        /**
+        -:  525:         * erase the element at pos.
+        -:  526:         *
+        -:  527:         * throw if pos pointed to a bad element (pos == this->end() || pos points an element out of this)
+        -:  528:         */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE5eraseENSA_8iteratorE called 100000 returned 100% blocks executed 44%
+   100000:  529:        void erase(iterator pos) {
+  100000*:  530:            if (pos.ptr == nullptr)throw invalid_iterator();
+   100000:  530-block  0
+branch  0 taken 0 (fallthrough)
+branch  1 taken 100000
+    %%%%%:  530-block  1
+call    2 never executed
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  530-block  2
+call    6 never executed
+    $$$$$:  530-block  3
+call    7 never executed
+  100000*:  531:            if (pos.bel != this)throw invalid_iterator();
+   100000:  531-block  0
+branch  0 taken 0 (fallthrough)
+branch  1 taken 100000
+    %%%%%:  531-block  1
+call    2 never executed
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  531-block  2
+call    6 never executed
+    $$$$$:  531-block  3
+call    7 never executed
+  100000*:  532:            if (pos.ptr == nil)throw invalid_iterator();
+   100000:  532-block  0
+branch  0 taken 0 (fallthrough)
+branch  1 taken 100000
+    %%%%%:  532-block  1
+call    2 never executed
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  532-block  2
+call    6 never executed
+    $$$$$:  532-block  3
+call    7 never executed
+        -:  533:
+   100000:  534:            node *pre = pos.ptr->left, *nex = pos.ptr->right;
+   100000:  535:            pre->right = nex, nex->left = pre;
+        -:  536:
+   100000:  537:            pre = pos.ptr->up, nex = pos.ptr->down;
+   100000:  538:            pre->down = nex;
+   100000:  539:            if (nex != nullptr)nex->up = pre;
+   100000:  539-block  0
+branch  0 taken 120 (fallthrough)
+branch  1 taken 99880
+      120:  539-block  1
+        -:  540:
+   100000:  541:            delete pos.ptr;
+   100000:  541-block  0
+branch  0 taken 100000 (fallthrough)
+branch  1 taken 0
+   100000:  541-block  1
+call    2 returned 100000
+call    3 returned 100000
+   100000:  542:            --element_size;
+   100000:  543:            re_allocate();
+   100000:  543-block  0
+call    0 returned 100000
+   100000:  544:        }
+        -:  545:
+        -:  546:        /**
+        -:  547:         * Returns the number of elements with key
+        -:  548:         *   that compares equivalent to the specified argument,
+        -:  549:         *   which is either 1 or 0
+        -:  550:         *     since this container does not allow duplicates.
+        -:  551:         */
+function _ZNK4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE5countERKS1_ called 99880 returned 100% blocks executed 100%
+    99880:  552:        size_t count(const Key &key) const {
+    99880:  553:            const node *ptr = my_find(key);
+    99880:  553-block  0
+call    0 returned 99880
+    99880:  554:            return ptr != nil;
+        -:  555:        }
+        -:  556:
+        -:  557:        /**
+        -:  558:         * Finds an element with key equivalent to key.
+        -:  559:         * key value of the element to search for.
+        -:  560:         * Iterator to an element with key equivalent to key.
+        -:  561:         *   If no such element is found, past-the-end (see end()) iterator is returned.
+        -:  562:         */
+function _ZN4sjtu14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE4findERKS1_ called 199760 returned 100% blocks executed 100%
+   199760:  563:        iterator find(const Key &key) {
+   199760:  564:            node *ptr = my_find(key);
+   199760:  564-block  0
+call    0 returned 199760
+   199760:  565:            return iterator(this, ptr);
+call    0 returned 199760
+        -:  566:        }
+        -:  567:
+        -:  568:        const_iterator find(const Key &key) const {
+        -:  569:            node *ptr = my_find(key);
+        -:  570:            return const_iterator(this, ptr);
+        -:  571:        }
+        -:  572:    };
+        -:  573:
+        -:  574:}
+        -:  575:
+        -:  576:#endif

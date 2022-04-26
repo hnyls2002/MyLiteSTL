@@ -1,0 +1,205 @@
+Index: map.hpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/map.hpp b/map.hpp
+--- a/map.hpp	
++++ b/map.hpp	
+@@ -11,10 +11,9 @@
+ #include "exceptions.hpp"
+ 
+ namespace sjtu {
+-
+     template<class Key, class T, class Compare = std::less<Key> >
+     class map {
+-    public:
++    private:
+         /**
+          * the internal type of data.
+          * it should have a default constructor, a copy constructor.
+@@ -22,6 +21,64 @@
+          */
+         typedef pair<const Key, T> value_type;
+ 
++        static Compare cmp;
++
++        friend bool operator<(const Key &u, const Key &v) {
++            return cmp(u, v);
++        }
++
++        friend bool operator>(const Key &u, const Key &v) {
++            return cmp(v, u);
++        }
++
++        friend bool operator==(const Key &u, const Key &v) {
++            return (!cmp(u, v)) && (!cmp(v, u));
++        }
++
++        friend bool operator!=(const Key &u, const Key &v) {
++            return cmp(u, v) || cmp(v, u);
++        }
++
++        class node {
++        public:
++            bool col;// 0-red 1-black
++            value_type data;
++            node *lc, *rc, *fa;
++
++            // key may not have default constructor !!!
++            // so node do not have constructor too !!!
++            // only copy constructor !!!
++            node(const node &other) : col(other.col), data(other.data), lc(other.lc), rc(other.rc), fa(other.fa) {}
++        } *root;
++
++        size_t _size;
++
++        void dfs_copy(node *&o1, node *o2, node *fa) {
++            if (o2 == nullptr)return;
++            o1 = new node(*o2), o1->fa = fa;
++            dfs_copy(o1->lc, o2->lc, o1);
++            dfs_copy(o1->rc, o2->rc, o1);
++        }
++
++        void dfs_destroy(node *o1) {
++            if (o1 == nullptr)return;
++            dfs_destroy(o1->lc);
++            dfs_destroy(o1->rc);
++            delete o1;
++            o1 = nullptr;
++        }
++
++        node *my_find(const Key &key) {
++            node *o = root;
++            while (o != nullptr && o->data.first != key) {
++                if (key < o->data.first)o = o->lc;
++                else o = o->rc;
++            }
++            return o;
++        }
++
++    public:
++
+         /**
+          * see BidirectionalIterator at CppReference for help.
+          *
+@@ -136,29 +193,48 @@
+         /**
+          * TODO two constructors
+          */
+-        map() {}
++        map() : root(nullptr), _size(0) {}
+ 
+-        map(const map &other) {}
++        map(const map &other) : _size(other._size) {
++            dfs_copy(root, other.root, nullptr);
++        }
+ 
+         /**
+          * TODO assignment operator
+          */
+-        map &operator=(const map &other) {}
++        map &operator=(const map &other) {
++            if (this == &other)return *this;
++            dfs_destroy(root);
++            _size = other._size;
++            dfs_copy(root, other.root, nullptr);
++            return *this;
++        }
+ 
+         /**
+          * TODO Destructors
+          */
+-        ~map() {}
++        ~map() {
++            _size = 0;
++            dfs_destroy(root);
++        }
+ 
+         /**
+          * TODO
+          * access specified element with bounds checking
+          * Returns a reference to the mapped value of the element with key equivalent to key.
+-         * If no such element exists, an exception of type `index_out_of_bound'
++         * If no such element exists, fan exception of type `index_out_o_bound'
+          */
+-        T &at(const Key &key) {}
++        T &at(const Key &key) {
++            node *res = my_find(key);
++            if (res == nullptr)throw index_out_of_bound();
++            return res->data.second;
++        }
+ 
+-        const T &at(const Key &key) const {}
++        const T &at(const Key &key) const {
++            node *res = my_find(key);
++            if (res == nullptr)throw index_out_of_bound();
++            return res->data.second;
++        }
+ 
+         /**
+          * TODO
+@@ -166,12 +242,23 @@
+          * Returns a reference to the value that is mapped to a key equivalent to key,
+          *   performing an insertion if such key does not already exist.
+          */
+-        T &operator[](const Key &key) {}
++        T &operator[](const Key &key) {
++            node *res = my_find(key);
++            if (res == nullptr) {
++                insert(pair<Key, T>(key, T()));
++                res = my_find(key);
++            }
++            return res->data.second;
++        }
+ 
+         /**
+          * behave like at() throw index_out_of_bound if such key does not exist.
+          */
+-        const T &operator[](const Key &key) const {}
++        const T &operator[](const Key &key) const {
++            node *res = my_find(key);
++            if (res == nullptr)throw index_out_of_bound();
++            return res->data.second;
++        }
+ 
+         /**
+          * return a iterator to the beginning
+@@ -192,17 +279,24 @@
+          * checks whether the container is empty
+          * return true if empty, otherwise false.
+          */
+-        bool empty() const {}
++        bool empty() const {
++            return _size == 0;
++        }
+ 
+         /**
+          * returns the number of elements.
+          */
+-        size_t size() const {}
++        size_t size() const {
++            return _size;
++        }
+ 
+         /**
+          * clears the contents
+          */
+-        void clear() {}
++        void clear() {
++            _size = 0;
++            dfs_destroy(root);
++        }
+ 
+         /**
+          * insert an element.
+@@ -210,7 +304,8 @@
+          *   the iterator to the new element (or the element that prevented the insertion),
+          *   the second one is true if insert successfully, or false.
+          */
+-        pair<iterator, bool> insert(const value_type &value) {}
++        pair<iterator, bool> insert(const value_type &value) {
++        }
+ 
+         /**
+          * erase the element at pos.

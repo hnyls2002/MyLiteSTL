@@ -1,0 +1,556 @@
+        -:    0:Source:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/main.cpp
+        -:    0:Graph:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/cmake-build-debug-coverage/CMakeFiles/linked_hashmap.dir/main.cpp.gcno
+        -:    0:Data:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/cmake-build-debug-coverage/CMakeFiles/linked_hashmap.dir/main.cpp.gcda
+        -:    0:Runs:1
+        -:    1:#include "linked_hashmap.hpp"
+        -:    2:#include <iostream>
+        -:    3:#include <cassert>
+        -:    4:#include <string>
+        -:    5:class Integer {
+        -:    6:public:
+        -:    7:    static int counter;
+        -:    8:    int val;
+        -:    9:
+function _ZN7IntegerC2Ei called 549640 returned 100% blocks executed 100%
+   549640:   10:    Integer(int val) : val(val) {
+   549640:   11:        counter++;
+   549640:   12:    }
+        -:   13:
+function _ZN7IntegerC2ERKS_ called 2189367 returned 100% blocks executed 100%
+  2189367:   14:    Integer(const Integer &rhs) {
+  2189367:   15:        val = rhs.val;
+  2189367:   16:        counter++;
+  2189367:   17:    }
+        -:   18:
+        -:   19:    Integer& operator = (const Integer &rhs) {
+        -:   20:        assert(false);
+        -:   21:    }
+        -:   22:
+function _ZN7IntegerD2Ev called 2739007 returned 100% blocks executed 100%
+  2739007:   23:    ~Integer() {
+  2739007:   24:        counter--;
+  2739007:   25:    }
+        -:   26:};
+        -:   27:
+        -:   28:int Integer::counter = 0;
+        -:   29:
+        -:   30:class Equal {
+        -:   31:public:
+function _ZNK5EqualclERK7IntegerS2_ called 549760 returned 100% blocks executed 100%
+   549760:   32:    bool operator () (const Integer &lhs, const Integer &rhs) const {
+   549760:   33:        return lhs.val == rhs.val;
+   549760:   33-block  0
+        -:   34:    }
+        -:   35:};
+        -:   36:class Hash {
+        -:   37:public:
+function _ZNK4HashclE7Integer called 1531647 returned 100% blocks executed 100%
+  1531647:   38:    unsigned int operator () (Integer lhs) const {
+  1531647:   39:        int val = lhs.val;
+  1531647:   40:        return std::hash<int>()(val);
+  1531647:   40-block  0
+call    0 returned 1531647
+        -:   41:    }
+        -:   42:};
+function _Z6testerv called 1 returned 100% blocks executed 72%
+        1:   43:void tester(void) {
+        -:   44:    //	test: constructor
+        2:   45:    sjtu::linked_hashmap<Integer, std::string,Hash,Equal> map;
+        1:   45-block  0
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+        1:   45-block  1
+call    3 returned 1
+    $$$$$:   45-block  2
+call    4 never executed
+        -:   46:    //	test: empty(), size()
+       1*:   47:    assert(map.empty() && map.size() == 0);
+        1:   47-block  0
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0
+        1:   47-block  1
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0
+    %%%%%:   47-block  2
+call    6 never executed
+        -:   48:    //	test: operator[], insert()
+   100001:   49:    for (int i = 0; i < 100000; ++i) {
+        1:   49-block  0
+   100001:   49-block  1
+branch  0 taken 100000 (fallthrough)
+branch  1 taken 1
+   200000:   50:        std::string string = "";
+   100000:   50-block  0
+call    0 returned 100000
+call    1 returned 100000
+branch  2 taken 100000 (fallthrough)
+branch  3 taken 0 (throw)
+   100000:   50-block  1
+call    4 returned 100000
+    $$$$$:   50-block  2
+    $$$$$:   50-block  3
+call    5 never executed
+   588889:   51:        for (int number = i; number; number /= 10) {
+   588889:   51-block  0
+branch  0 taken 488889 (fallthrough)
+branch  1 taken 100000
+   488889:   52:            char digit = '0' + number % 10;
+   488889:   53:            string = digit + string;
+   488889:   53-block  0
+call    0 returned 488889
+branch  1 taken 488889 (fallthrough)
+branch  2 taken 0 (throw)
+   488889:   53-block  1
+call    3 returned 488889
+call    4 returned 488889
+        -:   54:        }
+   100000:   55:        if (i & 1) {
+   100000:   55-block  0
+branch  0 taken 50000 (fallthrough)
+branch  1 taken 50000
+    50000:   56:            map[Integer(i)] = string;
+    50000:   56-block  0
+call    0 returned 50000
+call    1 returned 50000
+branch  2 taken 50000 (fallthrough)
+branch  3 taken 0 (throw)
+    50000:   56-block  1
+call    4 returned 50000
+branch  5 taken 50000 (fallthrough)
+branch  6 taken 0 (throw)
+    50000:   56-block  2
+call    7 returned 50000
+    $$$$$:   56-block  3
+call    8 never executed
+    $$$$$:   56-block  4
+    50000:   57:            auto result = map.insert(sjtu::pair<Integer, std::string>(Integer(i), string));
+call    0 returned 50000
+call    1 returned 50000
+branch  2 taken 50000 (fallthrough)
+branch  3 taken 0 (throw)
+    50000:   57-block  0
+call    4 returned 50000
+branch  5 taken 50000 (fallthrough)
+branch  6 taken 0 (throw)
+    50000:   57-block  1
+call    7 returned 50000
+branch  8 taken 50000 (fallthrough)
+branch  9 taken 0 (throw)
+    50000:   57-block  2
+call   10 returned 50000
+call   11 returned 50000
+call   12 returned 50000
+    $$$$$:   57-block  3
+call   13 never executed
+    $$$$$:   57-block  4
+    $$$$$:   57-block  5
+call   14 never executed
+    $$$$$:   57-block  6
+    $$$$$:   57-block  7
+call   15 never executed
+    $$$$$:   57-block  8
+   50000*:   58:            assert(!result.second);
+branch  0 taken 0 (fallthrough)
+branch  1 taken 50000
+    %%%%%:   58-block  0
+call    2 never executed
+        -:   59:        } else {
+    50000:   60:            auto result = map.insert(sjtu::pair<Integer, std::string>(Integer(i), string));
+    50000:   60-block  0
+call    0 returned 50000
+call    1 returned 50000
+branch  2 taken 50000 (fallthrough)
+branch  3 taken 0 (throw)
+    50000:   60-block  1
+call    4 returned 50000
+branch  5 taken 50000 (fallthrough)
+branch  6 taken 0 (throw)
+    50000:   60-block  2
+call    7 returned 50000
+branch  8 taken 50000 (fallthrough)
+branch  9 taken 0 (throw)
+    50000:   60-block  3
+call   10 returned 50000
+call   11 returned 50000
+call   12 returned 50000
+    $$$$$:   60-block  4
+call   13 never executed
+    $$$$$:   60-block  5
+    $$$$$:   60-block  6
+call   14 never executed
+    $$$$$:   60-block  7
+    $$$$$:   60-block  8
+call   15 never executed
+    $$$$$:   60-block  9
+   50000*:   61:            assert(result.second);
+branch  0 taken 0 (fallthrough)
+branch  1 taken 50000
+    %%%%%:   61-block  0
+call    2 never executed
+        -:   62:        }
+        -:   63:    }
+        -:   64:    //	test: count(), find(), erase()
+   100001:   65:    for (int i = 0; i < 100000; ++i) {
+        1:   65-block  0
+   100001:   65-block  1
+branch  0 taken 100000 (fallthrough)
+branch  1 taken 1
+   100000:   65-block  2
+   100000:   66:        if (i > 1896 && i <= 2016) {
+   100000:   66-block  0
+branch  0 taken 98103 (fallthrough)
+branch  1 taken 1897
+    98103:   66-block  1
+branch  2 taken 120 (fallthrough)
+branch  3 taken 97983
+      120:   67:            continue;
+      120:   67-block  0
+        -:   68:        }
+   99880*:   69:        assert(map.count(Integer(i)) == 1);
+    99880:   69-block  0
+call    0 returned 99880
+call    1 returned 99880
+branch  2 taken 99880 (fallthrough)
+branch  3 taken 0 (throw)
+    99880:   69-block  1
+branch  4 taken 0 (fallthrough)
+branch  5 taken 99880
+    %%%%%:   69-block  2
+call    6 never executed
+    99880:   69-block  3
+call    7 returned 99880
+    $$$$$:   69-block  4
+call    8 never executed
+    $$$$$:   69-block  5
+   99880*:   70:        assert(map.find(Integer(i)) != map.end());
+call    0 returned 99880
+branch  1 taken 99880 (fallthrough)
+branch  2 taken 0 (throw)
+    99880:   70-block  0
+call    3 returned 99880
+call    4 returned 99880
+branch  5 taken 99880 (fallthrough)
+branch  6 taken 0 (throw)
+    99880:   70-block  1
+call    7 returned 99880
+branch  8 taken 0 (fallthrough)
+branch  9 taken 99880
+    %%%%%:   70-block  2
+call   10 never executed
+    99880:   70-block  3
+call   11 returned 99880
+    $$$$$:   70-block  4
+call   12 never executed
+    $$$$$:   70-block  5
+    $$$$$:   70-block  6
+    99880:   71:        map.erase(map.find(Integer(i)));
+call    0 returned 99880
+call    1 returned 99880
+branch  2 taken 99880 (fallthrough)
+branch  3 taken 0 (throw)
+    99880:   71-block  0
+call    4 returned 99880
+branch  5 taken 99880 (fallthrough)
+branch  6 taken 0 (throw)
+    99880:   71-block  1
+call    7 returned 99880
+    $$$$$:   71-block  2
+    $$$$$:   71-block  3
+call    8 never executed
+    $$$$$:   71-block  4
+        -:   72:    }
+        -:   73:    //	test: constructor, operator=, clear();
+      121:   74:    for (int i = 0; i < (int)map.size(); ++i) {
+        1:   74-block  0
+      121:   74-block  1
+call    0 returned 121
+branch  1 taken 120 (fallthrough)
+branch  2 taken 1
+      240:   75:        sjtu::linked_hashmap<Integer, std::string,Hash,Equal> copy(map);
+      120:   75-block  0
+call    0 returned 120
+branch  1 taken 120 (fallthrough)
+branch  2 taken 0 (throw)
+      120:   75-block  1
+call    3 returned 120
+    $$$$$:   75-block  2
+call    4 never executed
+      120:   76:        map.clear();
+      120:   76-block  0
+call    0 returned 120
+branch  1 taken 120 (fallthrough)
+branch  2 taken 0 (throw)
+      120:   77:        std::cout << map.size() << " " << copy.size() << " ";
+      120:   77-block  0
+call    0 returned 120
+call    1 returned 120
+branch  2 taken 120 (fallthrough)
+branch  3 taken 0 (throw)
+      120:   77-block  1
+call    4 returned 120
+branch  5 taken 120 (fallthrough)
+branch  6 taken 0 (throw)
+      120:   77-block  2
+call    7 returned 120
+call    8 returned 120
+branch  9 taken 120 (fallthrough)
+branch 10 taken 0 (throw)
+      120:   77-block  3
+call   11 returned 120
+branch 12 taken 120 (fallthrough)
+branch 13 taken 0 (throw)
+      120:   78:        map = copy;
+      120:   78-block  0
+call    0 returned 120
+branch  1 taken 120 (fallthrough)
+branch  2 taken 0 (throw)
+      120:   79:        copy.clear();
+      120:   79-block  0
+call    0 returned 120
+branch  1 taken 120 (fallthrough)
+branch  2 taken 0 (throw)
+      120:   80:        std::cout << map.size() << " " << copy.size() << " ";
+      120:   80-block  0
+call    0 returned 120
+call    1 returned 120
+branch  2 taken 120 (fallthrough)
+branch  3 taken 0 (throw)
+      120:   80-block  1
+call    4 returned 120
+branch  5 taken 120 (fallthrough)
+branch  6 taken 0 (throw)
+      120:   80-block  2
+call    7 returned 120
+call    8 returned 120
+branch  9 taken 120 (fallthrough)
+branch 10 taken 0 (throw)
+      120:   80-block  3
+call   11 returned 120
+branch 12 taken 120 (fallthrough)
+branch 13 taken 0 (throw)
+      120:   81:        copy = map;
+      120:   81-block  0
+call    0 returned 120
+branch  1 taken 120 (fallthrough)
+branch  2 taken 0 (throw)
+      120:   82:        map.clear();
+      120:   82-block  0
+call    0 returned 120
+branch  1 taken 120 (fallthrough)
+branch  2 taken 0 (throw)
+      120:   83:        std::cout << map.size() << " " << copy.size() << " ";
+      120:   83-block  0
+call    0 returned 120
+call    1 returned 120
+branch  2 taken 120 (fallthrough)
+branch  3 taken 0 (throw)
+      120:   83-block  1
+call    4 returned 120
+branch  5 taken 120 (fallthrough)
+branch  6 taken 0 (throw)
+      120:   83-block  2
+call    7 returned 120
+call    8 returned 120
+branch  9 taken 120 (fallthrough)
+branch 10 taken 0 (throw)
+      120:   83-block  3
+call   11 returned 120
+branch 12 taken 120 (fallthrough)
+branch 13 taken 0 (throw)
+      120:   84:        map = copy;
+      120:   84-block  0
+call    0 returned 120
+branch  1 taken 120 (fallthrough)
+branch  2 taken 0 (throw)
+      120:   85:        copy.clear();
+      120:   85-block  0
+call    0 returned 120
+branch  1 taken 120 (fallthrough)
+branch  2 taken 0 (throw)
+      120:   86:        std::cout << map.size() << " " << copy.size() << " ";
+      120:   86-block  0
+call    0 returned 120
+call    1 returned 120
+branch  2 taken 120 (fallthrough)
+branch  3 taken 0 (throw)
+      120:   86-block  1
+call    4 returned 120
+branch  5 taken 120 (fallthrough)
+branch  6 taken 0 (throw)
+      120:   86-block  2
+call    7 returned 120
+call    8 returned 120
+branch  9 taken 120 (fallthrough)
+branch 10 taken 0 (throw)
+      120:   86-block  3
+call   11 returned 120
+branch 12 taken 120 (fallthrough)
+branch 13 taken 0 (throw)
+        -:   87:    }
+        1:   88:    std::cout << std::endl;
+        1:   88-block  0
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+        -:   89:    //	test: const_iterator, cbegin(), cend(), operator++, at()
+        1:   90:    sjtu::linked_hashmap<Integer, std::string,Hash,Equal>::const_iterator const_iterator;
+        1:   90-block  0
+call    0 returned 1
+        1:   91:    const_iterator = map.cbegin();
+call    0 returned 1
+      121:   92:    while (const_iterator != map.cend()) {
+      121:   92-block  0
+call    0 returned 121
+call    1 returned 121
+branch  2 taken 120 (fallthrough)
+branch  3 taken 1
+      240:   93:        const Integer integer(const_iterator->first);
+      120:   93-block  0
+call    0 returned 120
+call    1 returned 120
+      120:   93-block  1
+call    2 returned 120
+    $$$$$:   93-block  2
+call    3 never executed
+      120:   94:        const_iterator++;
+call    0 returned 120
+branch  1 taken 120 (fallthrough)
+branch  2 taken 0 (throw)
+      120:   95:        std::cout << map.at(integer) << " ";
+      120:   95-block  0
+call    0 returned 120
+branch  1 taken 120 (fallthrough)
+branch  2 taken 0 (throw)
+      120:   95-block  1
+call    3 returned 120
+branch  4 taken 120 (fallthrough)
+branch  5 taken 0 (throw)
+      120:   95-block  2
+call    6 returned 120
+branch  7 taken 120 (fallthrough)
+branch  8 taken 0 (throw)
+        -:   96:    }
+        1:   97:    std::cout << std::endl;
+        1:   97-block  0
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+        -:   98:    //	test: iterator, operator--, operator->
+        1:   99:    sjtu::linked_hashmap<Integer, std::string,Hash,Equal>::iterator iterator;
+        1:   99-block  0
+call    0 returned 1
+        1:  100:    iterator = map.end();
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+        1:  100-block  0
+        -:  101:    while (true) {
+      121:  102:        sjtu::linked_hashmap<Integer, std::string,Hash,Equal>::iterator peek = iterator;
+      121:  102-block  0
+call    0 returned 121
+      121:  103:        if (peek == map.begin()) {
+call    0 returned 121
+call    1 returned 121
+branch  2 taken 1 (fallthrough)
+branch  3 taken 120
+        1:  104:            std::cout << std::endl;
+        1:  104-block  0
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+        1:  105:            break;
+        1:  105-block  0
+        -:  106:        }
+      120:  107:        std::cout << (--iterator)->second << " ";
+      120:  107-block  0
+call    0 returned 120
+branch  1 taken 120 (fallthrough)
+branch  2 taken 0 (throw)
+      120:  107-block  1
+call    3 returned 120
+call    4 returned 120
+branch  5 taken 120 (fallthrough)
+branch  6 taken 0 (throw)
+      120:  107-block  2
+call    7 returned 120
+branch  8 taken 120 (fallthrough)
+branch  9 taken 0 (throw)
+      120:  108:    }
+      120:  108-block  0
+        -:  109:    //	test: erase()
+      121:  110:    while (map.begin() != map.end()) {
+      121:  110-block  0
+call    0 returned 121
+branch  1 taken 121 (fallthrough)
+branch  2 taken 0 (throw)
+      121:  110-block  1
+call    3 returned 121
+call    4 returned 121
+branch  5 taken 120 (fallthrough)
+branch  6 taken 1
+      120:  111:        map.erase(map.begin());
+      120:  111-block  0
+call    0 returned 120
+call    1 returned 120
+branch  2 taken 120 (fallthrough)
+branch  3 taken 0 (throw)
+      120:  111-block  1
+    $$$$$:  111-block  2
+        -:  112:    }
+       1*:  113:    assert(map.empty() && map.size() == 0);
+        1:  113-block  0
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0
+        1:  113-block  1
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0
+    %%%%%:  113-block  2
+call    6 never executed
+        -:  114:    //	test: operator[]
+   100001:  115:    for (int i = 0; i < 100000; ++i) {
+        1:  115-block  0
+   100001:  115-block  1
+branch  0 taken 100000 (fallthrough)
+branch  1 taken 1
+   100000:  116:        std::cout << map[Integer(i)];
+   100000:  116-block  0
+call    0 returned 100000
+call    1 returned 100000
+branch  2 taken 100000 (fallthrough)
+branch  3 taken 0 (throw)
+   100000:  116-block  1
+call    4 returned 100000
+branch  5 taken 100000 (fallthrough)
+branch  6 taken 0 (throw)
+   100000:  116-block  2
+call    7 returned 100000
+    $$$$$:  116-block  3
+call    8 never executed
+    $$$$$:  116-block  4
+        -:  117:    }
+        1:  118:    std::cout << map.size() << std::endl;
+        1:  118-block  0
+call    0 returned 1
+call    1 returned 1
+branch  2 taken 1 (fallthrough)
+branch  3 taken 0 (throw)
+        1:  118-block  1
+call    4 returned 1
+branch  5 taken 1 (fallthrough)
+branch  6 taken 0 (throw)
+        1:  119:}
+        -:  120:
+function main called 1 returned 100% blocks executed 100%
+        1:  121:int main(void) {
+        1:  122:    tester();
+        1:  122-block  0
+call    0 returned 1
+        1:  123:    std::cout << Integer::counter << std::endl;
+call    0 returned 1
+call    1 returned 1
+        1:  124:}

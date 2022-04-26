@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/BIG_HOMEWORK_1.dir/main.cpp.o  -o BIG_HOMEWORK_1 

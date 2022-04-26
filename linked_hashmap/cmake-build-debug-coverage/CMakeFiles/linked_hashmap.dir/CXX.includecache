@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/exceptions.hpp
+cstddef
+-
+cstring
+-
+string
+-
+
+/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/linked_hashmap.hpp
+functional
+-
+cstddef
+-
+utility.hpp
+/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/utility.hpp
+exceptions.hpp
+/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/exceptions.hpp
+
+/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/main.cpp
+linked_hashmap.hpp
+/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/linked_hashmap.hpp
+iostream
+-
+cassert
+-
+string
+-
+
+/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/utility.hpp
+utility
+-
+

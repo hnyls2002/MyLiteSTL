@@ -1,0 +1,589 @@
+Index: map.hpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/map.hpp b/map.hpp
+--- a/map.hpp	
++++ b/map.hpp	(date 1648602955094)
+@@ -1,3 +1,9 @@
++/**
++ * reference: Introduction to Algorithms
++ * using the strange sentinel node --- nil
++ * Thank your all family, sentinel
++ * (I am sad)
++ */
+ /**
+  * implement a container like std::map
+  */
+@@ -7,97 +13,80 @@
+ // only for std::less<T>
+ #include <functional>
+ #include <cstddef>
++#include <iostream>
+ #include "utility.hpp"
+ #include "exceptions.hpp"
+ 
+ namespace sjtu {
+     template<class Key, class T, class Compare = std::less<Key> >
+     class map {
++    public:
++        typedef pair<const Key, T> value_type;
+     private:
+         /**
+          * the internal type of data.
+          * it should have a default constructor, a copy constructor.
+          * You can use sjtu::map as value_type by typedef.
+          */
+-        typedef pair<const Key, T> value_type;
+-
+-        static Compare cmp;
+-
+-        bool friend operator<(const Key &x, const Key &y) {
+-            return cmp(x, y);
+-        }
+-
+-        bool friend operator>(const Key &x, const Key &y) {
+-            return cmp(y, x);
+-        }
+-
+-        bool friend operator==(const Key &x, const Key &y) {
+-            return !cmp(x, y) && !cmp(y, x);
+-        }
++        using MAP = map<Key, T, Compare>;
+ 
+-        bool friend operator!=(const Key &x, const Key &y) {
+-            return cmp(x, y) || cmp(y, x);
+-        }
+-
+-        bool friend operator<=(const Key &x, const Key &y) {
+-            return !cmp(y, x);
+-        }
+-
+-        bool friend operator>=(const Key &x, const Key &y) {
+-            return !cmp(x, y);
+-        }
++        Compare cmp;
+ 
+         class node {
+         public:
+             bool col;// 0-red 1-black
+-            value_type data;
++            value_type *data;
+             node *ch[2], *fa;
+ 
+             // key may not have default constructor !!!
+-            // so node needs a copy constructor
+-            node(const value_type &_data) : data(_data) {}
++            node() {
++                data = nullptr;
++            }
+ 
+-            node(const node &other) : col(other.col), data(other.data) {
+-                ch[0] = other.ch[0], ch[1] = other.ch[1], fa = other.fa;
++            node(const value_type &element, bool _col) : col(_col) {
++                data = new value_type(element);
++                ch[0] = ch[1] = fa = nullptr;
+             }
+-        } *nil, *root;
++        } *nil, *root, *__begin;
+ 
+         size_t _size;
+ 
+-        void dfs_copy(node *&o1, node *o2, node *fa) {
+-            if (o2 == nil)return;
+-            o1 = new node(*o2), o1->fa = fa;
+-            dfs_copy(o1->ch[0], o2->ch[0], o1);
+-            dfs_copy(o1->ch[1], o2->ch[1], o1);
++        void dfs_copy(node *&o1, node *o2, node *fa, node *o2_nil) {
++            if (o2 == o2_nil)return o1 = nil, void();
++            o1 = new node(*(o2->data), o2->col);
++            o1->fa = fa;
++            dfs_copy(o1->ch[0], o2->ch[0], o1, o2_nil);
++            dfs_copy(o1->ch[1], o2->ch[1], o1, o2_nil);
+         }
+ 
+-        void dfs_destroy(node *o1) {
++        void dfs_destroy(node *&o1) {
+             if (o1 == nil)return;
+             dfs_destroy(o1->ch[0]);
+             dfs_destroy(o1->ch[1]);
++            delete o1->data;
+             delete o1;
+             o1 = nil;
+         }
+ 
+-        node *my_find(const Key &key) {
++        node *my_find(const Key &key) const {
+             node *o = root;
+-            while (o != nil && o->data.first != key) {
+-                if (key < o->data.first)o = o->ch[0];
++            while (o != nil && (cmp(o->data->first, key) || cmp(key, o->data->first))) {
++                if (cmp(key, o->data->first))o = o->ch[0];
+                 else o = o->ch[1];
+             }
+             return o;
+         }
+ 
+-        inline bool rel(node *o) {
++        inline bool rel(const node *o) const {
+             return o->fa->ch[1] == o;
+         }
+ 
+-        inline node *U(node *o) {
++        inline node *U(const node *o) const {
+             if (o == root || o->fa == root)return nil;
+             return o->fa->fa->ch[rel(o->fa) ^ 1];
+         }
+ 
+-        inline node *B(node *o) {
++        inline node *B(const node *o) const {
+             if (o == root)return nil;
+             return o->fa->ch[rel(o) ^ 1];
+         }
+@@ -119,34 +108,36 @@
+ 
+         }
+ 
+-        node *Pre(const Key &key) {
+-            node *o = root, *res = nil;
+-            while (o != nil) {
+-                if (o->data.first >= key)o = o->ch[0];
+-                else res = o, o = o->ch[1];
+-            }
+-            return res;
+-        }
+ 
+-        node *Sub(const Key &key) {
+-            node *o = root, *res = nil;
+-            while (o != nil) {
+-                if (o->data.first <= key)o = o->ch[1];
+-                else res = o, o = o->ch[0];
+-            }
+-            return res;
+-        }
+-
+-        node *Min(node *o) {
++        node *Min(node *o) const {
+             while (o->ch[0] != nil)o = o->ch[0];
+             return o;
+         }
+ 
+-        node *Max(node *o) {
++        node *Max(node *o) const {
+             while (o->ch[1] != nil)o = o->ch[1];
+             return o;
+         }
+ 
++        node *Pre(const node *o) const {
++            if (o == nil)return nil;
++            if (o->ch[0] != nil)return Max(o->ch[0]);
++            while (o != root) {
++                if (rel(o) == 1)return o->fa;
++                o = o->fa;
++            }
++            return nil;
++        }
++
++        node *Sub(const node *o) const {
++            if (o == nil)return nil;
++            if (o->ch[1] != nil)return Min(o->ch[1]);
++            while (o != root) {
++                if (rel(o) == 0)return o->fa;
++                o = o->fa;
++            }
++            return nil;
++        }
+ 
+     public:
+ 
+@@ -166,7 +157,8 @@
+              *   just add whatever you want.
+              */
+ 
+-            map<Key, T> *id;
++            friend MAP;
++            MAP *id;
+             node *ptr;
+             // when ptr == nil , the iterator must be pointed to the end()
+ 
+@@ -183,8 +175,8 @@
+             // About iterator_category: https://en.cppreference.com/w/cpp/iterator
+             using difference_type = std::ptrdiff_t;
+             using value_type = map::value_type;
+-            using pointer = value_type*;
+-            using reference = value_type&;
++            using pointer = value_type *;
++            using reference = value_type &;
+             using iterator_category = std::output_iterator_tag;
+             // If you are interested in type_traits, toy_traits_test provides a place to
+             // practice. But the method used in that test is old and rarely used, so you
+@@ -193,7 +185,7 @@
+             // this part is only for bonus.
+ 
+ 
+-            iterator(map<Key, T> *_id = nullptr, node *_ptr = nullptr) : id(_id), ptr(_ptr) {
++            iterator(MAP *_id = nullptr, node *_ptr = nullptr) : id(_id), ptr(_ptr) {
+                 // TODO
+             }
+ 
+@@ -207,7 +199,7 @@
+             iterator operator++(int) {
+                 iterator ret = *this;
+                 if (ptr == id->nil)throw invalid_iterator();
+-                ptr = id->Sub(ptr->data.first);
++                ptr = id->Sub(ptr);
+                 return ret;
+             }
+ 
+@@ -216,7 +208,7 @@
+              */
+             iterator &operator++() {
+                 if (ptr == id->nil)throw invalid_iterator();
+-                ptr = id->Sub(ptr->data.first);
++                ptr = id->Sub(ptr);
+                 return *this;
+             }
+ 
+@@ -226,7 +218,7 @@
+             iterator operator--(int) {
+                 iterator ret = *this;
+                 if (ptr == id->nil)ptr = id->Max(id->root);
+-                else ptr = id->Pre(ptr->data.first);
++                else ptr = id->Pre(ptr);
+                 if (ptr == id->nil)throw invalid_iterator();
+                 return ret;
+             }
+@@ -236,7 +228,7 @@
+              */
+             iterator &operator--() {
+                 if (ptr == id->nil)ptr = id->Max(id->root);
+-                else ptr = id->Pre(ptr->data.first);
++                else ptr = id->Pre(ptr);
+                 if (ptr == id->nil)throw invalid_iterator();
+                 return *this;
+             }
+@@ -246,7 +238,7 @@
+              */
+             value_type &operator*() const {
+                 if (ptr == id->nil)throw invalid_iterator();
+-                return ptr->data;
++                return *(ptr->data);
+             }
+ 
+             bool operator==(const iterator &rhs) const {
+@@ -274,19 +266,24 @@
+              */
+             value_type *operator->() const noexcept {
+                 if (ptr == id->nil)throw invalid_iterator();
+-                return &(ptr->data);
++                return ptr->data;
+             }
+         };
+ 
+         class const_iterator {
++            /**
++             * TODO add data members
++             *   just add whatever you want.
++             */
+             // it should has similar member method as iterator.
+             //  and it should be able to construct from an iterator.
+         private:
+             // data members.
+-            map<Key, T> *id;
+-            node *ptr;
++            friend MAP;
++            const MAP *id;
++            const node *ptr;
+         public:
+-            const_iterator(map<Key, T> *_id = nullptr, node *_ptr = nullptr) : id(_id), ptr(_ptr) {
++            const_iterator(const MAP *_id = nullptr, const node *_ptr = nullptr) : id(_id), ptr(_ptr) {
+             }
+ 
+             const_iterator(
+@@ -305,7 +302,7 @@
+             const_iterator operator++(int) {
+                 const_iterator ret = *this;
+                 if (ptr == id->nil)throw invalid_iterator();
+-                ptr = id->Sub(ptr->data.first);
++                ptr = id->Sub(ptr);
+                 return ret;
+             }
+ 
+@@ -314,7 +311,7 @@
+              */
+             const_iterator &operator++() {
+                 if (ptr == id->nil)throw invalid_iterator();
+-                ptr = id->Sub(ptr->data.first);
++                ptr = id->Sub(ptr);
+                 return *this;
+             }
+ 
+@@ -324,7 +321,7 @@
+             const_iterator operator--(int) {
+                 const_iterator ret = *this;
+                 if (ptr == id->nil)ptr = id->Max(id->root);
+-                else ptr = id->Pre(ptr->data.first);
++                else ptr = id->Pre(ptr);
+                 if (ptr == id->nil)throw invalid_iterator();
+                 return ret;
+             }
+@@ -334,7 +331,7 @@
+              */
+             const_iterator &operator--() {
+                 if (ptr == id->nil)ptr = id->Max(id->root);
+-                else ptr = id->Pre(ptr->data.first);
++                else ptr = id->Pre(ptr);
+                 if (ptr == id->nil)throw invalid_iterator();
+                 return *this;
+             }
+@@ -344,7 +341,7 @@
+              */
+             const value_type &operator*() const {
+                 if (ptr == id->nil)throw invalid_iterator();
+-                return ptr->data;
++                return *(ptr->data);
+             }
+ 
+             bool operator==(const iterator &rhs) const {
+@@ -372,7 +369,7 @@
+              */
+             const value_type *operator->() const noexcept {
+                 if (ptr == id->nil)throw invalid_iterator();
+-                return &(ptr->data);
++                return ptr->data;
+             }
+         };
+ 
+@@ -381,19 +378,22 @@
+          */
+         map() : _size(0) {
+             // node may not have a default constructor
+-            nil = (node *) malloc(sizeof(node));
++            nil = new node;
+             nil->col = 1;
++            nil->data = nullptr;
+             nil->ch[0] = nil->ch[1] = nil->fa = nil;
+-            root = nil;
++            __begin = root = nil;
+         }
+ 
+         map(const map &other) : _size(other._size) {
+             // build the external node "nil" first
+-            nil = (node *) malloc(sizeof(node));
++            nil = new node;
+             nil->col = 1;
++            nil->data = nullptr;
+             nil->ch[0] = nil->ch[1] = nil->fa = nil;
+             root = nil;
+-            dfs_copy(root, other.root, nil);
++            dfs_copy(root, other.root, nil, other.nil);
++            __begin = Min(root);
+         }
+ 
+         /**
+@@ -404,7 +404,8 @@
+             dfs_destroy(root);
+             // nil already exist !!!
+             _size = other._size;
+-            dfs_copy(root, other.root, nil);
++            dfs_copy(root, other.root, nil, other.nil);
++            __begin = Min(root);
+             return *this;
+         }
+ 
+@@ -428,13 +429,13 @@
+         T &at(const Key &key) {
+             node *res = my_find(key);
+             if (res == nil)throw index_out_of_bound();
+-            return res->data.second;
++            return res->data->second;
+         }
+ 
+         const T &at(const Key &key) const {
+             node *res = my_find(key);
+             if (res == nil)throw index_out_of_bound();
+-            return res->data.second;
++            return res->data->second;
+         }
+ 
+         /**
+@@ -449,7 +450,7 @@
+                 insert(pair<Key, T>(key, T()));
+                 res = my_find(key);
+             }
+-            return res->data.second;
++            return res->data->second;
+         }
+ 
+         /**
+@@ -458,18 +459,18 @@
+         const T &operator[](const Key &key) const {
+             node *res = my_find(key);
+             if (res == nil)throw index_out_of_bound();
+-            return res->data.second;
++            return res->data->second;
+         }
+ 
+         /**
+          * return a iterator to the beginning
+          */
+         iterator begin() {
+-            return iterator(this, Min(root));
++            return iterator(this, __begin);
+         }
+ 
+         const_iterator cbegin() const {
+-            return const_iterator(this, Min(root));
++            return const_iterator(this, __begin);
+         }
+ 
+         /**
+@@ -505,6 +506,7 @@
+         void clear() {
+             _size = 0;
+             dfs_destroy(root);
++            __begin = root = nil;
+         }
+ 
+     private:
+@@ -541,19 +543,22 @@
+          */
+         pair<iterator, bool> insert(const value_type &value) {
+             node *o = root, *f = nil;
+-            while (o != nil && o->data.first != value.first) {
++            while (o != nil && (cmp(o->data->first, value.first) || cmp(value.first, o->data->first))) {
+                 f = o;
+-                if (o->data.first < value.first)o = o->ch[0];
++                if (cmp(value.first, o->data->first))o = o->ch[0];
+                 else o = o->ch[1];
+-            }
+-            if (o != nil)return std::make_pair(iterator(this, o), false);
+-            o = new node(value);
+-            o->col = 0;
++            };
++            if (o != nil)return pair<iterator, bool>(iterator(this, o), false);
++            ++_size;
++
++            o = new node(value, 0);
+             o->fa = f, o->ch[0] = o->ch[1] = nil;
+             if (o->fa == nil) root = o;
+-            else o->fa->ch[value.first > o->fa->data.first] = o;
++            else o->fa->ch[cmp(o->fa->data->first, value.first)] = o;
+             insert_fixup(o);
+-            return std::make_pair(iterator(this, o), true);
++
++            __begin = Min(root);
++            return pair<iterator, bool>(iterator(this, o), true);
+         }
+ 
+     private:
+@@ -569,17 +574,17 @@
+                 bool r = rel(o);
+                 if (B(o)->col == 0) {
+                     rotate(B(o));
+-                    swap(o->fa->col, o->fa->fa->col);
++                    std::swap(o->fa->col, o->fa->fa->col);
+                 } else if (B(o)->ch[0]->col == 1 && B(o)->ch[1]->col == 1) {
+                     B(o)->col = 0;
+                     o = o->fa;
+                 } else if (B(o)->ch[r]->col == 0 && B(o)->ch[r ^ 1]->col == 1) {
+                     node *son = B(o)->ch[r];
+                     rotate(son);
+-                    swap(son->col, son->ch[r ^ 1]->col);
++                    std::swap(son->col, son->ch[r ^ 1]->col);
+                 } else {
+                     rotate(B(o));
+-                    swap(o->fa->col, o->fa->fa->col);
++                    std::swap(o->fa->col, o->fa->fa->col);
+                     o->fa->fa->ch[r ^ 1]->col = 1;
+                     break;
+                 }
+@@ -587,6 +592,26 @@
+             o->col = 1;
+         }
+ 
++    private:
++        void node_swap(node *x, node *y) {
++            int rx = rel(x), ry = rel(y);
++            if (y->fa != nil)y->fa->ch[ry] = x;
++            else root = x;
++            if (x->fa != nil)x->fa->ch[rx] = y;
++            else root = y;
++            std::swap(x->fa, y->fa);
++
++            std::swap(x->ch[0], y->ch[0]);
++            if (x->ch[0] != nil)x->ch[0]->fa = x;
++            if (y->ch[0] != nil)y->ch[0]->fa = y;
++
++            std::swap(x->ch[1], y->ch[1]);
++            if (x->ch[1] != nil)x->ch[1]->fa = x;
++            if (y->ch[1] != nil)y->ch[1]->fa = y;
++
++            std::swap(x->col, y->col);
++        }
++
+     public:
+         /**
+          * erase the element at pos.
+@@ -601,17 +626,23 @@
+             else if (o->ch[1] == nil)o1 = o->ch[0];
+             else {
+                 node *suf = Min(o->ch[1]);
+-                std::swap(o->data, suf->data);
++
++                /*std::swap(o->data, suf->data);
++
+                 o = suf;
+-                o1 = suf->ch[1];
++                o1 = o->ch[1];*/
++
++                node_swap(o, suf);
++                o1 = o->ch[1];
+             }
+             init_col = o->col;
+             transplant(o, o1);
++            delete o->data;
+             delete o;
++            --_size;
+ 
+-            node *u = o1->fa;
+-            while (u != nil)pushup(o), u = u->fa;
+             if (init_col == 1)erase_fixup(o1);
++            __begin = Min(root);
+         }
+ 
+         /**
+@@ -621,7 +652,7 @@
+          *     since this container does not allow duplicates.
+          * The default method of check the equivalence is !(a < b || b > a)
+          */
+-        size_t count(const Key &key) const {
++        bool count(const Key &key) const {
+             return my_find(key) != nil;
+         }
+ 
+@@ -638,6 +669,23 @@
+         const_iterator find(const Key &key) const {
+             return const_iterator(this, my_find(key));
+         }
++
++    private:
++        int max_dep;
++
++        void dfs(node *o, int sum, int dep) {
++            if (o->col == 0 && (o->ch[0]->col == 0 || o->ch[1]->col == 0))std::cerr << "WARNING" << std::endl;
++            if (o == nil)return;
++            max_dep = std::max(max_dep, dep);
++            dfs(o->ch[0], sum + o->col, dep + 1), dfs(o->ch[1], sum + o->col, dep + 1);
++        }
++
++    public:
++        void test() {
++            max_dep = 0;
++            dfs(root, 0, 0);
++            std::cerr << max_dep << std::endl;
++        }
+     };
+ 
+ }

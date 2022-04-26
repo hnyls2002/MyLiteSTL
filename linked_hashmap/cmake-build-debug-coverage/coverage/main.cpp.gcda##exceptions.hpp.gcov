@@ -1,0 +1,77 @@
+        -:    0:Source:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/exceptions.hpp
+        -:    0:Graph:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/cmake-build-debug-coverage/CMakeFiles/linked_hashmap.dir/main.cpp.gcno
+        -:    0:Data:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/cmake-build-debug-coverage/CMakeFiles/linked_hashmap.dir/main.cpp.gcda
+        -:    0:Runs:1
+        -:    1:#ifndef SJTU_EXCEPTIONS_HPP
+        -:    2:#define SJTU_EXCEPTIONS_HPP
+        -:    3:
+        -:    4:#include <cstddef>
+        -:    5:#include <cstring>
+        -:    6:#include <string>
+        -:    7:
+        -:    8:namespace sjtu {
+        -:    9:
+        -:   10:class exception {
+        -:   11:protected:
+        -:   12:	const std::string variant = "";
+        -:   13:	std::string detail = "";
+        -:   14:public:
+function _ZN4sjtu9exceptionC2Ev called 0 returned 0% blocks executed 0%
+    #####:   15:	exception() {}
+    %%%%%:   15-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:   15-block  1
+call    4 never executed
+call    5 never executed
+call    6 never executed
+branch  7 never executed
+branch  8 never executed
+    %%%%%:   15-block  2
+call    9 never executed
+    $$$$$:   15-block  3
+call   10 never executed
+    $$$$$:   15-block  4
+call   11 never executed
+    $$$$$:   15-block  5
+call   12 never executed
+    $$$$$:   15-block  6
+    $$$$$:   15-block  7
+call   13 never executed
+        -:   16:	exception(const exception &ec) : variant(ec.variant), detail(ec.detail) {}
+function _ZN4sjtu9exception4whatB5cxx11Ev called 0 returned 0% blocks executed 0%
+    #####:   17:	virtual std::string what() {
+    #####:   18:		return variant + " " + detail;
+    %%%%%:   18-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:   18-block  1
+call    4 never executed
+    %%%%%:   18-block  2
+    $$$$$:   18-block  3
+call    5 never executed
+        -:   19:	}
+        -:   20:};
+        -:   21:
+        -:   22:class index_out_of_bound : public exception {
+        -:   23:	/* __________________________ */
+        -:   24:};
+        -:   25:
+        -:   26:class runtime_error : public exception {
+        -:   27:	/* __________________________ */
+        -:   28:};
+        -:   29:
+        -:   30:class invalid_iterator : public exception {
+        -:   31:	/* __________________________ */
+        -:   32:};
+        -:   33:
+        -:   34:class container_is_empty : public exception {
+        -:   35:	/* __________________________ */
+        -:   36:};
+        -:   37:}
+        -:   38:
+        -:   39:#endif

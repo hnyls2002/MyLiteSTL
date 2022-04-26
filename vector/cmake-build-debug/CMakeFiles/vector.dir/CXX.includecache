@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/f/My Infomation/semester/数据结构/homework/vector/exceptions.hpp
+cstddef
+-
+cstring
+-
+string
+-
+
+/mnt/f/My Infomation/semester/数据结构/homework/vector/main.cpp
+iostream
+-
+vector.hpp
+/mnt/f/My Infomation/semester/数据结构/homework/vector/vector.hpp
+
+/mnt/f/My Infomation/semester/数据结构/homework/vector/vector.hpp
+exceptions.hpp
+/mnt/f/My Infomation/semester/数据结构/homework/vector/exceptions.hpp
+climits
+-
+cstddef
+-
+iostream
+-
+cstdio
+-
+cmath
+-
+cstring
+-
+

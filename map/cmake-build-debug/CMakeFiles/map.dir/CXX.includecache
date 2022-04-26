@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/f/My Infomation/semester/数据结构/homework/map/exceptions.hpp
+cstddef
+-
+cstring
+-
+string
+-
+
+/mnt/f/My Infomation/semester/数据结构/homework/map/main.cpp
+iostream
+-
+algorithm
+-
+map.hpp
+/mnt/f/My Infomation/semester/数据结构/homework/map/map.hpp
+
+/mnt/f/My Infomation/semester/数据结构/homework/map/map.hpp
+functional
+-
+cstddef
+-
+iostream
+-
+utility.hpp
+/mnt/f/My Infomation/semester/数据结构/homework/map/utility.hpp
+exceptions.hpp
+/mnt/f/My Infomation/semester/数据结构/homework/map/exceptions.hpp
+
+/mnt/f/My Infomation/semester/数据结构/homework/map/utility.hpp
+utility
+-
+

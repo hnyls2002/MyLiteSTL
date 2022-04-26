@@ -1,0 +1,80 @@
+        -:    0:Source:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/utility.hpp
+        -:    0:Graph:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/cmake-build-debug-coverage/CMakeFiles/linked_hashmap.dir/main.cpp.gcno
+        -:    0:Data:/mnt/f/My Infomation/semester/数据结构/homework/linked_hashmap/cmake-build-debug-coverage/CMakeFiles/linked_hashmap.dir/main.cpp.gcda
+        -:    0:Runs:1
+        -:    1:#ifndef SJTU_UTILITY_HPP
+        -:    2:#define SJTU_UTILITY_HPP
+        -:    3:
+        -:    4:#include <utility>
+        -:    5:
+        -:    6:namespace sjtu {
+        -:    7:
+        -:    8:template<class T1, class T2>
+        -:    9:class pair {
+        -:   10:public:
+        -:   11:	T1 first;
+        -:   12:	T2 second;
+        -:   13:	constexpr pair() : first(), second() {}
+function _ZN4sjtu4pairIK7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEEC2ERKS9_ called 307600 returned 100% blocks executed 80%
+   307600:   14:	pair(const pair &other) = default;
+   307600:   14-block  0
+call    0 returned 307600
+call    1 returned 307600
+branch  2 taken 307600 (fallthrough)
+branch  3 taken 0 (throw)
+   307600:   14-block  1
+    $$$$$:   14-block  2
+call    4 never executed
+        -:   15:	pair(pair &&other) = default;
+        -:   16:	pair(const T1 &x, const T2 &y) : first(x), second(y) {}
+        -:   17:	template<class U1, class U2>
+   350000:   18:	pair(U1 &&x, U2 &&y) : first(x), second(y) {}
+------------------
+_ZN4sjtu4pairINS_14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE8iteratorEbEC2ISC_bEEOT_OT0_:
+function _ZN4sjtu4pairINS_14linked_hashmapI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE4Hash5EqualE8iteratorEbEC2ISC_bEEOT_OT0_ called 100000 returned 100% blocks executed 100%
+   100000:   18:	pair(U1 &&x, U2 &&y) : first(x), second(y) {}
+   100000:   18-block  0
+call    0 returned 100000
+------------------
+_ZN4sjtu4pairIK7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEEC2IRS2_S8_EEOT_OT0_:
+function _ZN4sjtu4pairIK7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEEC2IRS2_S8_EEOT_OT0_ called 150000 returned 100% blocks executed 80%
+   150000:   18:	pair(U1 &&x, U2 &&y) : first(x), second(y) {}
+   150000:   18-block  0
+call    0 returned 150000
+call    1 returned 150000
+branch  2 taken 150000 (fallthrough)
+branch  3 taken 0 (throw)
+   150000:   18-block  1
+    $$$$$:   18-block  2
+call    4 never executed
+------------------
+_ZN4sjtu4pairI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEEC2IS1_RS7_EEOT_OT0_:
+function _ZN4sjtu4pairI7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEEC2IS1_RS7_EEOT_OT0_ called 100000 returned 100% blocks executed 80%
+   100000:   18:	pair(U1 &&x, U2 &&y) : first(x), second(y) {}
+   100000:   18-block  0
+call    0 returned 100000
+call    1 returned 100000
+branch  2 taken 100000 (fallthrough)
+branch  3 taken 0 (throw)
+   100000:   18-block  1
+    $$$$$:   18-block  2
+call    4 never executed
+------------------
+        -:   19:	template<class U1, class U2>
+        -:   20:	pair(const pair<U1, U2> &other) : first(other.first), second(other.second) {}
+        -:   21:	template<class U1, class U2>
+function _ZN4sjtu4pairIK7IntegerNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEEC2IS1_S8_EEONS0_IT_T0_EE called 100000 returned 100% blocks executed 80%
+   100000:   22:	pair(pair<U1, U2> &&other) : first(other.first), second(other.second) {}
+   100000:   22-block  0
+call    0 returned 100000
+call    1 returned 100000
+branch  2 taken 100000 (fallthrough)
+branch  3 taken 0 (throw)
+   100000:   22-block  1
+    $$$$$:   22-block  2
+call    4 never executed
+        -:   23:};
+        -:   24:
+        -:   25:}
+        -:   26:
+        -:   27:#endif
